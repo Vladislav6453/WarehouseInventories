@@ -1,0 +1,420 @@
+﻿<Window x:Class="WarehouseInventory.Windows.ChartsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:WarehouseInventory.Windows"
+        xmlns:wpf="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        mc:Ignorable="d"
+        Title="ChartsWindow" Height="800" Width="1300">
+
+
+    <Window.Resources>
+
+        <!-- ТЕНИ -->
+        <DropShadowEffect x:Key="CardShadow"
+                          Color="#000000"
+                          BlurRadius="20"
+                          ShadowDepth="4"
+                          Opacity="0.08"/>
+
+        <DropShadowEffect x:Key="SoftShadow"
+                          Color="#000000"
+                          BlurRadius="12"
+                          ShadowDepth="2"
+                          Opacity="0.06"/>
+
+        <DropShadowEffect x:Key="PopupShadow"
+                          Color="#000000"
+                          BlurRadius="25"
+                          ShadowDepth="3"
+                          Opacity="0.15"/>
+        
+        <!-- СТИЛЬ КНОПОК МЕНЮ -->
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Margin="4,2">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F3F4F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- СТИЛЬ ЗАГОЛОВКА POPUP -->
+        <Style x:Key="PopupHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="Margin" Value="12,12,12,8"/>
+        </Style>
+
+        <!-- СТИЛЬ ДЛЯ SEPARATOR -->
+        <Style TargetType="Separator">
+            <Setter Property="Height" Value="1"/>
+            <Setter Property="Background" Value="#E5E7EB"/>
+            <Setter Property="Margin" Value="8,8"/>
+        </Style>
+
+        <!-- СТИЛЬ ДЛЯ TABITEM -->
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0,0,0,3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="BorderBrush" Value="#3B82F6"/>
+                    <Setter Property="Foreground" Value="#3B82F6"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#3B82F6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!-- СТИЛЬ КАРТОЧЕК СТАТИСТИКИ -->
+        <Style x:Key="StatCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="18,14"/>
+            <Setter Property="Effect" Value="{StaticResource SoftShadow}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- СТИЛЬ БЫСТРЫХ КНОПОК ФИЛЬТРА -->
+        <Style x:Key="QuickFilterButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#4B5563"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F3F4F6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Grid.Column="1" Margin="0,0,0,0" Orientation="Horizontal">
+             <Button Content="☰"
+                        Width="40"
+                        Height="60"
+                        FontSize="40"
+                        Margin="0 0 20 0"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        BorderThickness="1"
+                        Cursor="Hand"
+                        Command="{Binding ToggleMenuCommand}"/>
+                
+                <Popup IsOpen="{Binding IsMenuOpen}"
+                       PlacementTarget="{Binding ElementName=MenuButton}"
+                       Placement="Bottom"
+                       StaysOpen="False"
+                       AllowsTransparency="True">
+
+                    <Border Background="White"
+                            Width="260"
+                            CornerRadius="16"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1"
+                            Effect="{StaticResource PopupShadow}"
+                            Margin="0,8,0,0">
+
+                        <StackPanel Margin="8">
+
+                            <Border Background="#F8FAFC"
+                                    CornerRadius="12"
+                                    Margin="0,0,0,8">
+                                <StackPanel Margin="12,12,12,12">
+                                    <TextBlock Text="📂 НАВИГАЦИЯ"
+                                               Style="{StaticResource PopupHeaderStyle}"/>
+                                    <TextBlock Text="Перемещение между разделами"
+                                               FontSize="11"
+                                               Foreground="#9CA3AF"
+                                               Margin="12,4,12,0"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Button Content="📦 Товары"
+                                    Style="{StaticResource MenuButtonStyle}"
+                                    Command="{Binding NavigateProductCommand}"/>
+                            
+                            <Button Content="🏭 Поставщики"
+                                    Style="{StaticResource MenuButtonStyle}"
+                                    Command="{Binding NavigateToCustomerCommand}"/>
+                            
+                            <Button Content="⏩ Движения"
+                                    Style="{StaticResource MenuButtonStyle}"
+                                    Command="{Binding NavigateToMovementCommand}"/>
+
+                            <Button Content="✉️ Накладные"
+                                    Style="{StaticResource MenuButtonStyle}"
+                                    Command="{Binding NavigateToInvoiceCommand}"/>
+                            
+                            <Button Content="👤 Клиенты"
+                                    Style="{StaticResource MenuButtonStyle}"
+                                    Command="{Binding NavigateToSupplierCommand}"/>
+                            
+                            <Separator/>
+
+                            <Button Content="🚪 Выход"
+                                    Style="{StaticResource MenuButtonStyle}"
+                                    Foreground="#EF4444"
+                                    Command="{Binding LogoutCommand}"/>
+                        </StackPanel>
+
+                    </Border>
+                </Popup>
+             <StackPanel>
+            <TextBlock Text="📊 Аналитика склада"
+                       FontSize="28"
+                       FontWeight="SemiBold"
+                       Foreground="#2C3E50"/>
+            <TextBlock Text="Визуализация складских операций, остатков и аналитика по контрагентам"
+                       FontSize="13"
+                       Foreground="#6B7280"
+                       Margin="0,6,0,0"/>
+             </StackPanel>
+        </StackPanel>
+        
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Border Grid.Column="0" Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="📦 Всего операций" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding TotalMovements}" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" Margin="0,5,0,0"/>
+                    <TextBlock Text="за выбранный период" FontSize="11" Foreground="#9CA3AF" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <Border Grid.Column="1" Style="{StaticResource StatCardStyle}" Margin="12,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="💰 Общий приход" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding TotalIncome}" FontSize="28" FontWeight="Bold" Foreground="#10B981" Margin="0,5,0,0"/>
+                    <TextBlock Text="сумма всех приходов" FontSize="11" Foreground="#9CA3AF" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <Border Grid.Column="2" Style="{StaticResource StatCardStyle}" Margin="12,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="💸 Общий расход" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding TotalExpense}" FontSize="28" FontWeight="Bold" Foreground="#EF4444" Margin="0,5,0,0"/>
+                    <TextBlock Text="сумма всех расходов" FontSize="11" Foreground="#9CA3AF" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <Border Grid.Column="3" Style="{StaticResource StatCardStyle}" Margin="12,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="🏪 Остаток на складе" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding CurrentStock}" FontSize="28" FontWeight="Bold" Foreground="#3B82F6" Margin="0,5,0,0"/>
+                    <TextBlock Text="всего единиц товара" FontSize="11" Foreground="#9CA3AF" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="14"
+                Padding="15,12"
+                Margin="0,0,0,20"
+                Effect="{StaticResource SoftShadow}">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="📅 Период:" VerticalAlignment="Center" Foreground="#4B5563" Margin="0,0,12,0"/>
+                    <ComboBox Width="160" Height="34" SelectedItem="{Binding SelectedPeriod}" ItemsSource="{Binding Periods}"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="30,0,0,0">
+                    <Button Content="Неделя" Style="{StaticResource QuickFilterButtonStyle}" Command="{Binding SetWeekCommand}"/>
+                    <Button Content="Месяц" Style="{StaticResource QuickFilterButtonStyle}" Command="{Binding SetMonthCommand}"/>
+                    <Button Content="Квартал" Style="{StaticResource QuickFilterButtonStyle}" Command="{Binding SetQuarterCommand}"/>
+                    <Button Content="Год" Style="{StaticResource QuickFilterButtonStyle}" Command="{Binding SetYearCommand}"/>
+                </StackPanel>
+                
+                <Button Grid.Column="2" Content="🔄 Обновить" Width="130" Height="34" Background="#3B82F6" Foreground="White" FontWeight="SemiBold" Command="{Binding RefreshCommand}"/>
+            </Grid>
+        </Border>
+        
+        <Border Grid.Row="3"
+                Background="White"
+                CornerRadius="20"
+                Padding="10,5,10,10"
+                Effect="{StaticResource CardShadow}">
+
+            <TabControl>
+                
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📈 " />
+                            <TextBlock Text="Движение товаров" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Динамика движения товаров по датам" FontSize="14" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,15"/>
+                        <wpf:CartesianChart Grid.Row="1" Series="{Binding MovementSeries}" XAxes="{Binding DateAxes}" YAxes="{Binding ValueAxes}" LegendPosition="Right"/>
+                    </Grid>
+                </TabItem>
+                
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🥧 " />
+                            <TextBlock Text="Приход / Расход" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Соотношение приходов и расходов" FontSize="14" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,15"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <wpf:PieChart Series="{Binding MovementTypeSeries}" Width="400" Height="400" HorizontalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="40,0,0,0">
+                                <Border Background="#10B981" Width="16" Height="16" CornerRadius="4" Margin="0,0,12,0"/>
+                                <TextBlock Text="Приход" FontWeight="SemiBold" Margin="0,5,0,20"/>
+                                <Border Background="#EF4444" Width="16" Height="16" CornerRadius="4" Margin="0,0,12,0"/>
+                                <TextBlock Text="Расход" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🏆 " />
+                            <TextBlock Text="Топ товаров" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Наиболее популярные товары" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
+                            <ComboBox Grid.Column="1" Width="150" Height="32" SelectedItem="{Binding TopProductsMetric}" ItemsSource="{Binding TopProductsMetrics}"/>
+                        </Grid>
+                        <wpf:CartesianChart Grid.Row="1" Series="{Binding TopProductsSeries}" XAxes="{Binding ProductAxes}" YAxes="{Binding ValueAxes}" Margin="0,15,0,0"/>
+                    </Grid>
+                </TabItem>
+                
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📊 "/>
+                            <TextBlock Text="Остатки товаров"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid Margin="15">
+                        <TextBlock Text="Текущие остатки на складе" FontSize="14" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,15"/>
+                        <wpf:CartesianChart Series="{Binding StockSeries}" XAxes="{Binding ProductAxes}" YAxes="{Binding ValueAxes}"/>
+                    </Grid>
+                </TabItem>
+
+
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🧑 " />
+                            <TextBlock Text="Топ клиентов" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Лучшие клиенты по объёму закупок" FontSize="14" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,15"/>
+                        <wpf:CartesianChart Grid.Row="1" Series="{Binding TopCustomersSeries}" XAxes="{Binding CustomerAxes}" YAxes="{Binding ValueAxes}"/>
+                    </Grid>
+                </TabItem>
+                
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🏭 " />
+                            <TextBlock Text="Топ поставщиков" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Основные поставщики товаров" FontSize="14" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,0,15"/>
+                        <wpf:CartesianChart Grid.Row="1" Series="{Binding TopSuppliersSeries}" XAxes="{Binding SupplierAxes}" YAxes="{Binding ValueAxes}"/>
+                    </Grid>
+                </TabItem>
+
+            </TabControl>
+
+        </Border>
+        
+    </Grid>
+</Window>

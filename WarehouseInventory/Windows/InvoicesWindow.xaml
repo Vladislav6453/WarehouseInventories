@@ -1,0 +1,289 @@
+﻿<Window x:Class="WarehouseInventory.Windows.InvoicesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:WarehouseInventory.Windows"
+        xmlns:viewModels="clr-namespace:WarehouseInventory.ViewModels"
+        mc:Ignorable="d"
+        Title="InvoicesWindow" Height="720"
+        Width="1150"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F6F9">
+
+    <Window.Resources>
+
+        <!-- ТЕНИ -->
+        <DropShadowEffect x:Key="CardShadow"
+                  Color="#000000"
+                  BlurRadius="20"
+                  ShadowDepth="4"
+                  Opacity="0.08"/>
+
+        <DropShadowEffect x:Key="SoftShadow"
+                  Color="#000000"
+                  BlurRadius="12"
+                  ShadowDepth="2"
+                  Opacity="0.06"/>
+
+        <DropShadowEffect x:Key="PopupShadow"
+                  Color="#000000"
+                  BlurRadius="25"
+                  ShadowDepth="3"
+                  Opacity="0.15"/>
+
+        <!-- СТИЛЬ КНОПОК МЕНЮ -->
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="8"
+                        Margin="4,2">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F3F4F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- СТИЛЬ ЗАГОЛОВКА POPUP -->
+        <Style x:Key="PopupHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="Margin" Value="12,12,12,8"/>
+        </Style>
+
+        <!-- СТИЛЬ ДЛЯ SEPARATOR -->
+        <Style TargetType="Separator">
+            <Setter Property="Height" Value="1"/>
+            <Setter Property="Background" Value="#E5E7EB"/>
+            <Setter Property="Margin" Value="8,8"/>
+        </Style>
+
+        <!-- СТИЛЬ ДЛЯ TABITEM -->
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0,0,0,3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="BorderBrush" Value="#3B82F6"/>
+                    <Setter Property="Foreground" Value="#3B82F6"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#3B82F6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F8F9FA"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+        
+        <Style TargetType="DataGridRow">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#EEF6FF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0" Margin="0,0,0,25">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="☰"
+                    FontSize="30"
+                    Width="42"
+                    Height="42"
+                    Background="#F4F6F9"
+                    BorderBrush="Transparent"
+                    BorderThickness="1"
+                    Command="{Binding ToggleMenuCommand}"/>
+
+            <Popup IsOpen="{Binding IsMenuOpen}"
+                   PlacementTarget="{Binding ElementName=MenuButton}"
+                   Placement="Bottom"
+                   StaysOpen="False">
+
+                <Border Background="White"
+                        Width="220"
+                        CornerRadius="12"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        Padding="8"
+                        Effect="{StaticResource PopupShadow}">
+
+                    <StackPanel Margin="8">
+                        <Border Background="#F8FAFC"
+                            CornerRadius="12"
+                            Margin="0,0,0,8">
+                            <StackPanel Margin="12,12,12,12">
+                                <TextBlock Text="📂 НАВИГАЦИЯ"
+                                    Style="{StaticResource PopupHeaderStyle}"/>
+                                <TextBlock Text="Перемещение между разделами"
+                                FontSize="11"
+                                Foreground="#9CA3AF"
+                                Margin="12,4,12,0"/>        
+                            </StackPanel>
+                        </Border>
+                        
+                        <Separator/>
+
+                        <Button Content="🏠 Дашборд"
+                                Style="{StaticResource MenuButtonStyle}"
+                                Command="{Binding NavigateDashboardCommand}"/>
+
+                        <Button Content="📦 Товары"
+                                Style="{StaticResource MenuButtonStyle}"
+                                Command="{Binding NavigateProductsCommand}"/>
+
+                        <Button Content="👤 Клиенты"
+                                Style="{StaticResource MenuButtonStyle}"
+                                Command="{Binding NavigateCustomersCommand}"/>
+
+                        <Button Content="🏭 Поставщики"
+                                Style="{StaticResource MenuButtonStyle}"
+                                Command="{Binding NavigateSuppliersCommand}"/>
+
+                        <Button Content="🧾 Накладные"
+                                Style="{StaticResource MenuButtonStyle}"
+                                IsEnabled="False"/>
+
+                        <Button Content="📊 Движения"
+                                Style="{StaticResource MenuButtonStyle}"
+                                Command="{Binding NavigateMovementsCommand}"/>
+
+                        <Button Content="📈 Отчёты"
+                                Style="{StaticResource MenuButtonStyle}"
+                                Command="{Binding NavigateReportsCommand}"/>
+
+                        <Separator/>
+
+                        <Button Content="🚪 Выход"
+                                Style="{StaticResource MenuButtonStyle}"
+                                Foreground="#EF4444"
+                                Command="{Binding LogoutCommand}"/>
+                    </StackPanel>
+                </Border>
+            </Popup>
+            
+            <TextBlock Grid.Column="1"
+                       Text="🧾 Накладные"
+                       FontSize="26"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Margin="15,0,0,0"/>
+            
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                
+                <Border Width="360"
+                        Height="40"
+                        Background="White"
+                        CornerRadius="10"
+                        BorderBrush="#D1D5DB"
+                        BorderThickness="1"
+                        Margin="0,0,10,0">
+                    <Grid>
+                        <TextBlock Text="🔍"
+                                   FontSize="19"
+                                   Foreground="#9CA3AF"
+                                   VerticalAlignment="Center"
+                                   Margin="16,0,0,0"/>
+                        
+                        <TextBox Background="Transparent"
+                                 BorderThickness="0"
+                                 VerticalContentAlignment="Center"
+                                 Margin="48,0,40,0"
+                                 Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"/>
+                        
+                        <Button Content="✕"
+                                Width="30"
+                                Height="30"
+                                FontSize="20"
+                                HorizontalAlignment="Right"
+                                Margin="0,0,8,0"
+                                Background="Transparent"
+                                Foreground="#6B7280"
+                                BorderBrush="Transparent"
+                                Command="{Binding ClearSearchCommand}"/>
+                    
+                    </Grid>
+                </Border>
+                
+                <Button Content="✚ Создать"
+                        Width="150"
+                        Height="40"
+                        Background="#3B82F6"
+                        Foreground="White"
+                        FontWeight="SemiBold"
+                        Command="{Binding OpenCreateInvoiceCommand}"/>
+
+            </StackPanel>
+        </Grid>
+        
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="14"
+                Padding="12"
+                Effect="{StaticResource CardShadow}">
+
+            <DataGrid ItemsSource="{Binding Invoices}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      RowHeight="48"
+                      GridLinesVisibility="None"
+                      AlternatingRowBackground="#F9FAFB">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="№" Binding="{Binding Number}" Width="120"/>
+                    <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="150"/>
+                    <DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="120"/>
+                    <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="*"/>
+                    <DataGridTextColumn Header="Сумма" Binding="{Binding TotalAmount}" Width="150"/>
+                </DataGrid.Columns>
+
+            </DataGrid>
+        </Border>
+    </Grid>
+</Window>

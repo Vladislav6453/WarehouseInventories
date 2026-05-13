@@ -1,0 +1,104 @@
+﻿<Window x:Class="WarehouseInventory.Windows.CustomersEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:WarehouseInventory.Windows"
+        mc:Ignorable="d"
+        Title="CustomersEditWindow" Height="500" Width="500">
+    <Window.Resources>
+
+        <DropShadowEffect x:Key="CardShadow"
+                          Color="#000000"
+                          BlurRadius="20"
+                          ShadowDepth="4"
+                          Opacity="0.10"/>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <Border Background="White"
+                CornerRadius="18"
+                Padding="24"
+                Width="460"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Effect="{StaticResource CardShadow}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="🤚 Регистрация клиента"
+                           FontSize="22"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,20"/>
+                
+                <StackPanel Grid.Row="1">
+
+                    <TextBlock Text="Название"
+                               FontSize="12"
+                               Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,14"/>
+
+                    <TextBlock Text="Телефон"
+                               FontSize="12"
+                               Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,14"/>
+
+                    <TextBlock Text="Email"
+                               FontSize="12"
+                               Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,14"/>
+                    
+                    <TextBlock Text="Адрес"
+                               FontSize="12"
+                               Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"/>
+
+                </StackPanel>
+                
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Margin="0,22,0,0">
+
+                    <Button Content="Отмена"
+                            Width="110"
+                            Margin="0,0,10,0"
+                            Background="#E5E7EB"
+                            Foreground="#374151"
+                            Command="{Binding CancelCommand}"/>
+
+                    <Button Content="Сохранить"
+                            Width="120"
+                            Background="#10B981"
+                            Foreground="White"
+                            Command="{Binding SaveCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
