@@ -214,13 +214,14 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Phone).HasMaxLength(255);
         });
 
-        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<EmployeeRole>().HasData(
             new EmployeeRole{Id=1,Role = "Админ"},
             new EmployeeRole{Id=2,Role = "Сотрудник"},
             new EmployeeRole{Id=3,Role = "Менеджер"}
         );
             
+
         modelBuilder.Entity<MovementType>().HasData(
             new MovementType{Id=1,Name = "Приход"},
             new MovementType{Id=2,Name = "Расход"}
@@ -236,6 +237,7 @@ public partial class AppDbContext : DbContext
             new Product{Id=2,Name = "Ноутбук MacBook Air", Description = "", Price = 999000, Quantity = 0, CategoryId = 1 },
             new Product{Id=3,Name = "Мышь Logitech", Description = "", Price = 2500, Quantity = 2, CategoryId = 2 }
         );
+        base.OnModelCreating(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
