@@ -15,17 +15,21 @@ namespace WarehouseInventory.ViewModels
     public class InvoiceEditViewModel : BaseViewModel
     {
         private readonly HttpClient _httpClient;
+        private Action? _close;
+
+        // ==================== ПОЛЯ ФОРМЫ ====================
         private string _number = "";
         private string _description = "";
         private DateTime _date = DateTime.Now;
         private InvoiceTypeDTO? _selectedType;
         private CounterpartyDTO? _selectedCounterparty;
+
+        // ==================== КОЛЛЕКЦИИ ====================
         private ObservableCollection<InvoiceTypeDTO> _types = new();
         private ObservableCollection<CounterpartyDTO> _counterparties = new();
         private ObservableCollection<InvoiceItemDTO> _items = new();
         private ObservableCollection<ProductForInvoiceDTO> _availableProducts = new();
-        private Action? _close;
-        private int _currentEmployeeId = 1;
+
 
         public string Number
         {
@@ -51,6 +55,7 @@ namespace WarehouseInventory.ViewModels
             set
             {
                 _selectedType = value;
+                SelectedCounterparty = null; // Очищаем контрагента
                 OnPropertyChanged();
                 _ = LoadCounterpartiesAsync();
             }
@@ -92,7 +97,6 @@ namespace WarehouseInventory.ViewModels
         public ICommand RemoveItemCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
-
         public InvoiceEditViewModel()
         {
             _httpClient = new HttpClient();
@@ -123,7 +127,7 @@ namespace WarehouseInventory.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Ошибка загрузки типов: {ex.Message}", "Ошибка",
+                MessageBox.Show($"Ошибка загрузки типов: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -148,7 +152,7 @@ namespace WarehouseInventory.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Ошибка загрузки контрагентов: {ex.Message}", "Ошибка",
+                MessageBox.Show($"Ошибка загрузки контрагентов: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -167,20 +171,14 @@ namespace WarehouseInventory.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Ошибка загрузки товаров: {ex.Message}", "Ошибка",
+                MessageBox.Show($"Ошибка загрузки товаров: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void AddItem()
         {
-            Items.Add(new InvoiceItemDTO
-            {
-                ProductId = 0,
-                ProductName = "",
-                Quantity = 1,
-                Price = 0
-            });
+            Items.Add(new InvoiceItemDTO());
         }
 
         private void RemoveItem(object? parameter)
@@ -191,6 +189,7 @@ namespace WarehouseInventory.ViewModels
 
         private async System.Threading.Tasks.Task SaveAsync()
         {
+            // 1. Проверка номера накладной
             if (string.IsNullOrWhiteSpace(Number))
             {
                 MessageBox.Show("❌ Введите номер накладной", "Ошибка",
@@ -198,6 +197,7 @@ namespace WarehouseInventory.ViewModels
                 return;
             }
 
+            // 2. Проверка типа накладной
             if (SelectedType == null)
             {
                 MessageBox.Show("❌ Выберите тип накладной", "Ошибка",
@@ -205,22 +205,33 @@ namespace WarehouseInventory.ViewModels
                 return;
             }
 
+            // 3. Проверка контрагента
             if (SelectedCounterparty == null)
             {
-                var msg = SelectedType.Type == "Приходная" ? "поставщика" : "клиента";
+                string msg = SelectedType.Type == "Приходная" ? "поставщика" : "клиента";
                 MessageBox.Show($"❌ Выберите {msg}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            var invalidItems = Items.Where(i => i.ProductId == 0 || string.IsNullOrWhiteSpace(i.ProductName)).ToList();
-            if (invalidItems.Any())
+            // 4. Проверка: есть ли товары?
+            if (Items.Count == 0)
             {
-                MessageBox.Show("❌ Заполните все товары", "Ошибка",
+                MessageBox.Show("❌ Добавьте хотя бы один товар", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
+            // 5. Проверка: все ли товары выбраны?
+            var emptyItems = Items.Where(i => i.SelectedProduct == null).ToList();
+            if (emptyItems.Any())
+            {
+                MessageBox.Show("❌ Выберите товары для всех строк", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // 6. Проверка: количество > 0
             if (Items.Any(i => i.Quantity <= 0))
             {
                 MessageBox.Show("❌ Количество товара должно быть больше 0", "Ошибка",
@@ -228,21 +239,13 @@ namespace WarehouseInventory.ViewModels
                 return;
             }
 
+            // 7. Для расходной накладной: проверка актуальности цены
             if (SelectedType.Type == "Расходная")
             {
-                foreach (var item in Items)
-                {
-                    var product = AvailableProducts.FirstOrDefault(p => p.Id == item.ProductId);
-                    if (product != null && product.Price != item.Price)
-                    {
-                        var result = MessageBox.Show($"Цена товара \"{item.ProductName}\" изменилась. Использовать актуальную цену {product.Price}₽ вместо {item.Price}₽?",
-                            "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                        if (result == MessageBoxResult.Yes)
-                            item.Price = product.Price;
-                    }
-                }
+                await CheckAndUpdatePrices();
             }
 
+            // 8. Сохраняем
             try
             {
                 var request = new CreateInvoiceRequestDTO
@@ -251,10 +254,15 @@ namespace WarehouseInventory.ViewModels
                     Description = Description,
                     Date = Date,
                     TypeId = SelectedType.Id,
-                    EmployeeId = _currentEmployeeId,
+                    EmployeeId = GetCurrentEmployeeId(),
                     SupplierId = SelectedType.Type == "Приходная" ? SelectedCounterparty.Id : null,
                     CustomerId = SelectedType.Type == "Расходная" ? SelectedCounterparty.Id : null,
-                    Items = Items.ToList()
+                    Items = Items.Select(i => new InvoiceItemDTO
+                    {
+                        SelectedProduct = i.SelectedProduct,
+                        Quantity = i.Quantity,
+                        Price = i.Price
+                    }).ToList()
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("Invoices", request);
@@ -276,6 +284,32 @@ namespace WarehouseInventory.ViewModels
             {
                 MessageBox.Show($"❌ Ошибка: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private int GetCurrentEmployeeId()
+        {
+            // Временно: потом из сессии
+            return Application.Current.Properties["CurrentUserId"] as int? ?? 1;
+        }
+
+        private async System.Threading.Tasks.Task CheckAndUpdatePrices()
+        {
+            foreach (var item in Items)
+            {
+                var product = AvailableProducts.FirstOrDefault(p => p.Id == item.ProductId);
+                if (product != null && product.Price != item.Price)
+                {
+                    var result = MessageBox.Show(
+                        $"Цена товара \"{item.ProductName}\" изменилась.\n\n" +
+                        $"Текущая цена: {product.Price:N2} ₽\n" +
+                        $"Цена в накладной: {item.Price:N2} ₽\n\n" +
+                        $"Использовать текущую цену?",
+                        "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                        item.Price = product.Price;
+                }
             }
         }
     }

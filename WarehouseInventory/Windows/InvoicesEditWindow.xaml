@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:WarehouseInventory.Windows"
+        xmlns:local="clr-namespace:WarehouseInventory"
         xmlns:viewModels="clr-namespace:WarehouseInventory.ViewModels"
         mc:Ignorable="d"
         Title="CreateInvoiceWindow" 
@@ -121,10 +121,19 @@
 
                 <DataGrid.Columns>
 
-                    <DataGridComboBoxColumn Header="Товар"
-                                            SelectedItemBinding="{Binding Product}"
-                                            DisplayMemberPath="Name"
-                                            Width="*"/>
+                    <DataGridTemplateColumn Header="Товар" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding SelectedProduct.Name}" VerticalAlignment="Center" Margin="8,0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding DataContext.AvailableProducts, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                          SelectedItem="{Binding SelectedProduct}" DisplayMemberPath="Name" IsEditable="False"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
 
                     <DataGridTextColumn Header="Кол-во"
                                         Binding="{Binding Quantity}"
@@ -138,6 +147,17 @@
                                         Binding="{Binding Total}"
                                         Width="120"
                                         IsReadOnly="True"/>
+                    
+                    <DataGridTemplateColumn Header="" Width="40">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="✕" FontSize="14" FontWeight="Bold" Background="Transparent"
+                                        Foreground="#EF4444" BorderThickness="0" Cursor="Hand"
+                                        Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
                 </DataGrid.Columns>
             </DataGrid>

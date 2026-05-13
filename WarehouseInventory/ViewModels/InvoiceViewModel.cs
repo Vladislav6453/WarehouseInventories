@@ -77,7 +77,7 @@ namespace WarehouseInventory.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Ошибка загрузки: {ex.Message}", "Ошибка",
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -102,7 +102,7 @@ namespace WarehouseInventory.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Ошибка поиска: {ex.Message}", "Ошибка",
+                MessageBox.Show($"Ошибка поиска: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

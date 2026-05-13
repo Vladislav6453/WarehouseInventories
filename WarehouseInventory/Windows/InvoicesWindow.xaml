@@ -11,8 +11,11 @@
         WindowStartupLocation="CenterScreen"
         Background="#F4F6F9">
 
-    <Window.Resources>
+    <Window.DataContext>
+        <viewModels:InvoiceViewModel/>
+    </Window.DataContext>
 
+    <Window.Resources>
         <!-- ТЕНИ -->
         <DropShadowEffect x:Key="CardShadow"
                   Color="#000000"

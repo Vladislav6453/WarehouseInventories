@@ -79,13 +79,13 @@ public class InvoicesController : ControllerBase
     public async Task<IActionResult> GetCustomers()
     {
         var customers = await _context.Customers
-            .Select(c => new CounterpartyDTO
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Type = "Customer"
-            })
-            .ToListAsync();
+                .Select(c => new CounterpartyDTO
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Type = "Customer"
+                })
+                .ToListAsync();
 
         return Ok(customers);
     }
@@ -112,9 +112,27 @@ public class InvoicesController : ControllerBase
 
         try
         {
+            // 1. Проверка уникальности номера
             if (await _context.Invoices.AnyAsync(i => i.Number == request.Number))
                 return BadRequest(new { message = "Накладная с таким номером уже существует" });
 
+            // 2. Проверка остатков при расходе ✅
+            if (request.TypeId == 2) // Расходная
+            {
+                foreach (var item in request.Items)
+                {
+                    var product = await _context.Products.FindAsync(item.ProductId);
+                    if (product == null)
+                        return BadRequest(new { message = $"Товар с ID {item.ProductId} не найден" });
+
+                    if (product.Quantity < item.Quantity)
+                    {
+                        return BadRequest(new { message = $"Недостаточно товара \"{product.Name}\" на складе. Доступно: {product.Quantity}, запрошено: {item.Quantity}" });
+                    }
+                }
+            }
+
+            // 3. Создание накладной
             var invoice = new Invoice
             {
                 Number = request.Number,
@@ -130,6 +148,7 @@ public class InvoicesController : ControllerBase
             _context.Invoices.Add(invoice);
             await _context.SaveChangesAsync();
 
+            // 4. Создание движений и обновление остатков
             int movementTypeId = request.TypeId == 1 ? 1 : 2;
 
             foreach (var item in request.Items)
@@ -148,9 +167,10 @@ public class InvoicesController : ControllerBase
                 };
                 _context.StockMovements.Add(movement);
 
-                if (request.TypeId == 1)
+                // Обновляем количество товара
+                if (request.TypeId == 1) // Приход
                     product.Quantity += item.Quantity;
-                else
+                else // Расход
                     product.Quantity -= item.Quantity;
             }
 

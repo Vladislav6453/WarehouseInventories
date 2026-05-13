@@ -4,10 +4,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:WarehouseInventory.Windows"
+        xmlns:viewModels="clr-namespace:WarehouseInventory.ViewModels"
         mc:Ignorable="d"
         Title="CustomersEditWindow" Height="500" Width="500">
-    <Window.Resources>
 
+    <Window.DataContext>
+        <viewModels:CustomerEditViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
         <DropShadowEffect x:Key="CardShadow"
                           Color="#000000"
                           BlurRadius="20"

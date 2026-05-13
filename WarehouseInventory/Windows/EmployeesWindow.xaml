@@ -3,10 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:WarehouseInventory.Windows"
+        xmlns:local="clr-namespace:WarehouseInventory"
+        xmlns:viewModels="clr-namespace:WarehouseInventory.ViewModels"
         mc:Ignorable="d"
         Title="DashBoardWindow" Height="450" Width="980">
-    
+
+    <Window.DataContext>
+        <viewModels:EmployeeViewModel/>
+    </Window.DataContext>
+
     <Window.Resources>
         <DropShadowEffect x:Key="CardShadow"
                           Color="#000000"
@@ -150,14 +155,7 @@
                     </Grid>
                 </Border>
                 
-                <Button Content="😀 Добавить"
-                        Width="140"
-                        Height="44"
-                        Background="#10B981"
-                        Foreground="White"
-                        FontWeight="SemiBold"
-                        Margin="0,0,10,0"
-                        Command="{Binding AddCustomerCommand}"/>
+                
 
                 <Button Content="✏️ Изменить"
                         Width="120"
@@ -165,14 +163,14 @@
                         Background="#F59E0B"
                         Foreground="White"
                         Margin="0,0,10,0"
-                        Command="{Binding EditCustomerCommand}"/>
+                        Command="{Binding EditEmployeeCommand}"/>
 
                 <Button Content="☠︎ Удалить"
                         Width="110"
                         Height="44"
                         Background="#EF4444"
                         Foreground="White"
-                        Command="{Binding DeleteCustomerCommand}"/>
+                        Command="{Binding DeleteEmployeeCommand}"/>
 
             </StackPanel>
         </Grid>
@@ -185,7 +183,7 @@
                 Padding="12"
                 Effect="{StaticResource CardShadow}">
 
-            <DataGrid ItemsSource="{Binding Customers}"
+            <DataGrid ItemsSource="{Binding Employees}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
                       GridLinesVisibility="None"

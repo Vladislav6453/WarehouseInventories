@@ -3,11 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:WarehouseInventory.Windows"
+        xmlns:local="clr-namespace:WarehouseInventory"
+        xmlns:viewModels="clr-namespace:WarehouseInventory.ViewModels"
         mc:Ignorable="d"
         Title="EmployeesEditWindow" Height="620" Width="600">
-    <Window.Resources>
 
+    <Window.DataContext>
+        <viewModels:EmployeeEditViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
         <DropShadowEffect x:Key="CardShadow"
                           Color="#000000"
                           BlurRadius="20"

@@ -155,6 +155,17 @@
                                  VerticalContentAlignment="Center"
                                  FontSize="14"
                                  Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Button Content="✕"
+                                FontSize="20"
+                                Width="30"
+                                Height="30"
+                                HorizontalAlignment="Right"
+                                Margin="0,0,8,0"
+                                Background="Transparent"
+                                Foreground="#6B7280"
+                                BorderBrush="Transparent"
+                                Command="{Binding ClearSearchCommand}"/>
                     </Grid>
                 </Border>
                 
