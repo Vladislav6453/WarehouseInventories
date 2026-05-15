@@ -29,10 +29,9 @@ namespace WarehouseInventory.ViewModels
         public void SetPasswordBinding(System.Windows.Controls.PasswordBox passwordBox)
         {
             _passwordBox = passwordBox;
-    
-            // Подписываемся на изменение пароля
+            
             _passwordBox.PasswordChanged += (s, e) =>
-            {
+            { 
                 Password = _passwordBox.Password;
             };
         }
@@ -101,7 +100,7 @@ namespace WarehouseInventory.ViewModels
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("http://localhost:5059/api/");
 
-            SaveCommand = new RelayCommand(_ => _ = SaveAsync());
+            SaveCommand = new RelayCommand(async _ => await SaveAsync());
             CancelCommand = new RelayCommand(_ => _close?.Invoke());
 
         }
@@ -170,6 +169,9 @@ namespace WarehouseInventory.ViewModels
                     RoleId = SelectedRole.Id,
                     Password = string.IsNullOrWhiteSpace(Password) ? null : Password
                 };
+                
+                if(!string.IsNullOrEmpty(_passwordBox.Password ))
+                    request.Password = _passwordBox.Password;
 
                 var response = await _httpClient.PutAsJsonAsync("Employees", request);
 

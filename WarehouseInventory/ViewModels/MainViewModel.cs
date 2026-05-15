@@ -54,6 +54,7 @@ public class MainViewModel : BaseViewModel
         public ICommand NavigateToInvoiceCommand { get; }
         public ICommand NavigateToCustomerCommand { get; }
         public ICommand NavigateToSupplierCommand { get; }
+        public ICommand NavigateToEmployeeCommand { get; }
         public ICommand LogoutCommand { get; }
 
         public MainViewModel()
@@ -62,8 +63,8 @@ public class MainViewModel : BaseViewModel
             _httpClient.BaseAddress = new Uri("http://localhost:5059/api/");
             AddProductCommand = new RelayCommand(_ => OpenAddProductWindow());
             EditProductCommand = new RelayCommand(_ => OpenProductEditWindow(SelectedProduct), _ => SelectedProduct != null);
-            //LogoutCommand = new RelayCommand(_ => OnLogout?.Invoke());
             LogoutCommand = new RelayCommand(_ => OnLogout());
+            NavigateToEmployeeCommand = new RelayCommand(_ => NavigateToEmployee());
             NavigateToChartCommand = new RelayCommand(_ => NavigateToChart());
             NavigateToSupplierCommand = new RelayCommand(_ => NavigateToSupplier());
             NavigateToMovementCommand = new RelayCommand(_ => NavigateToMovement());
@@ -85,6 +86,16 @@ public class MainViewModel : BaseViewModel
             chartsWindow.Owner = _currentWindow;
             chartsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             chartsWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToEmployee()
+        {
+            IsMenuOpen = false;
+            var employeesWindow = new EmployeesWindow();
+            employeesWindow.Owner = _currentWindow;
+            employeesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            employeesWindow.Show();
             _currentWindow?.Hide();
         }
         

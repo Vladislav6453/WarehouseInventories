@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:WarehouseInventory"
         xmlns:viewModels="clr-namespace:WarehouseInventory.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="950"
-        MaxHeight="800" MaxWidth="1300"
+        Title="MainWindow" Height="520" Width="950"
+        MaxHeight="1100" MaxWidth="1300"
         WindowStartupLocation="CenterScreen"
         Background="#ECF0F1">
         
@@ -45,8 +45,6 @@
             <Setter Property="AutoGenerateColumns" Value="False"/>
             <Setter Property="CanUserAddRows" Value="False"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="SelectionMode" Value="Single"/>
-            <Setter Property="SelectionUnit" Value="FullRow"/>
         </Style>
         
         <Style TargetType="DataGridColumnHeader">
@@ -86,6 +84,7 @@
                     <Button Content="✉️ Накладные" Command="{Binding NavigateToInvoiceCommand}" CommandParameter="Charts" Style="{StaticResource NavButtonStyle}"/>
                     <Button Content="🏭 Поставщики" Command="{Binding NavigateToSupplierCommand}" CommandParameter="Suppliers" Style="{StaticResource NavButtonStyle}"/>
                     <Button Content="👤 Клиенты" Command="{Binding NavigateToCustomerCommand}" CommandParameter="Customers" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="🗃️ Сотрудники" Command="{Binding NavigateToEmployeeCommand}" CommandParameter="Customers" Style="{StaticResource NavButtonStyle}"/>
                 </StackPanel>
 
                 <Separator Margin="10,20,10,10" Background="#34495E"/>

@@ -13,25 +13,92 @@
     </Window.DataContext>
     <Window.Resources>
 
+        <!-- ТЕНИ -->
         <DropShadowEffect x:Key="CardShadow"
-                          Color="#000000"
-                          BlurRadius="20"
-                          ShadowDepth="4"
-                          Opacity="0.09"/>
+                  Color="#000000"
+                  BlurRadius="20"
+                  ShadowDepth="4"
+                  Opacity="0.08"/>
 
+        <DropShadowEffect x:Key="SoftShadow"
+                  Color="#000000"
+                  BlurRadius="12"
+                  ShadowDepth="2"
+                  Opacity="0.06"/>
+
+        <DropShadowEffect x:Key="PopupShadow"
+                  Color="#000000"
+                  BlurRadius="25"
+                  ShadowDepth="3"
+                  Opacity="0.15"/>
+
+        <!-- СТИЛЬ КНОПОК МЕНЮ -->
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Margin" Value="0"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="8"
+                        Margin="4,2">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F3F4F6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- СТИЛЬ ЗАГОЛОВКА POPUP -->
+        <Style x:Key="PopupHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="Margin" Value="12,12,12,8"/>
+        </Style>
+
+        <!-- СТИЛЬ ДЛЯ SEPARATOR -->
+        <Style TargetType="Separator">
+            <Setter Property="Height" Value="1"/>
+            <Setter Property="Background" Value="#E5E7EB"/>
+            <Setter Property="Margin" Value="8,8"/>
+        </Style>
+
+        <!-- СТИЛЬ ДЛЯ TABITEM -->
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0,0,0,3"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="BorderBrush" Value="#3B82F6"/>
+                    <Setter Property="Foreground" Value="#3B82F6"/>
+                </Trigger>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#F3F4F6"/>
+                    <Setter Property="Foreground" Value="#3B82F6"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
+
 
         <Style TargetType="DataGridColumnHeader">
             <Setter Property="Background" Value="#F8F9FA"/>
@@ -71,20 +138,22 @@
             <!-- MENU -->
             <Grid Grid.Column="0">
 
-                <Button x:Name="MenuButton"
-                        Content="☰"
-                        Width="42"
-                        Height="42"
-                        FontSize="30"
-                        Background="White"
-                        BorderBrush="Transparent"
-                        BorderThickness="1"
-                        Command="{Binding ToggleMenuCommand}"/>
+                <Button  Content="☰"
+                         Width="40"
+                         Height="60"
+                         FontSize="40"
+                         Margin="0 0 20 0"
+                         Background="Transparent"
+                         BorderBrush="Transparent"
+                         BorderThickness="1"
+                         Cursor="Hand"
+                         Command="{Binding ToggleMenuCommand}"/>
 
-                <Popup IsOpen="{Binding IsMenuOpen}"
-                       PlacementTarget="{Binding ElementName=MenuButton}"
-                       Placement="Bottom"
-                       StaysOpen="False">
+                <Popup  IsOpen="{Binding IsMenuOpen}"
+                        PlacementTarget="{Binding ElementName=MenuButton}"
+                        Placement="Bottom"
+                        StaysOpen="False"
+                        AllowsTransparency="True">
 
                     <Border Background="White"
                             Width="220"
@@ -92,31 +161,47 @@
                             BorderBrush="#E5E7EB"
                             BorderThickness="1"
                             Padding="8"
-                            Effect="{StaticResource CardShadow}">
+                            Effect="{StaticResource PopupShadow}">
 
                         <StackPanel>
-                            <TextBlock Text="📂 Навигация"
-                                       FontWeight="SemiBold"
-                                       Margin="8,5,8,10"/>
+                            <Border Background="#F8FAFC"
+                                    CornerRadius="12"
+                                    Margin="0,0,0,8">
+                                <StackPanel Margin="12,12,12,12">
+                                    <TextBlock Text="📂 НАВИГАЦИЯ"
+                                               Style="{StaticResource PopupHeaderStyle}"/>
+                                    <TextBlock Text="Перемещение между разделами"
+                                               FontSize="11"
+                                               Foreground="#9CA3AF"
+                                               Margin="12,4,12,0"/>        
+                                </StackPanel>
+                            </Border>
 
                             <Separator/>
-
-                            <Button Content="🏠 Дашборд" 
-                                    Style="{StaticResource MenuButtonStyle}" 
-                                    Command="{Binding NavigateDashboardCommand}"/>
+                            
                             <Button Content="📦 Товары" 
                                     Style="{StaticResource MenuButtonStyle}" 
                                     Command="{Binding NavigateProductsCommand}"/>
-                            <Button Content="👤 Клиенты" 
+                            
+                            <Button Content="👨‍💼 Сотрудники" 
                                     Style="{StaticResource MenuButtonStyle}" 
-                                    Command="{Binding NavigateCustomersCommand}"/>
+                                    Command="{Binding NavigateEmployeesCommand}"/>
+
                             <Button Content="🏭 Поставщики" 
                                     Style="{StaticResource MenuButtonStyle}" 
                                     Command="{Binding NavigateSuppliersCommand}"/>
+                            
+                            <Button Content="📈 Графики" 
+                                    Style="{StaticResource MenuButtonStyle}" 
+                                    Command="{Binding NavigateChartsCommand}"/>
+                            
                             <Button Content="🧾 Накладные" 
                                     Style="{StaticResource MenuButtonStyle}" 
                                     Command="{Binding NavigateInvoicesCommand}"/>
 
+                            <Button Content="📊 Движения"
+                                    Style="{StaticResource MenuButtonStyle}"
+                                    Command="{Binding NavigateMovementsCommand}"/>
                             <Separator/>
 
                             <Button Content="🚪 Выход"

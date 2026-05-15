@@ -10,19 +10,11 @@ namespace Library.DTO
 {
     public class InvoiceItemDTO : INotifyPropertyChanged
     {
-        // public ProductForInvoiceDTO? SelectedProduct { get; set; }
-        // public int Quantity { get; set; } = 1;
-        //
-        // public decimal Price { get; set; }
-        //
-        // public decimal Total => Quantity * Price;
-        //
-        // public int ProductId => SelectedProduct?.Id ?? 0;
-        // public string ProductName => SelectedProduct?.Name ?? "";
-        
         private ProductForInvoiceDTO? _selectedProduct;
         private int _quantity = 1;
         private decimal _price;
+        private int _productId;  
+        private string _productName = ""; 
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -69,10 +61,28 @@ namespace Library.DTO
                 OnPropertyChanged(nameof(Total));
             }
         }
+        
+        public int ProductId
+        {
+            get => _productId;
+            set { _productId = value; OnPropertyChanged(); }
+        }
 
-        public decimal Total => Quantity * Price;
+        public string ProductName
+        {
+            get => _productName;
+            set { _productName = value; OnPropertyChanged(); }
+        }
 
-        public int ProductId => SelectedProduct?.Id ?? 0;
-        public string ProductName => SelectedProduct?.Name ?? "";
+        public decimal Total
+        {
+            get
+            {
+                var total = Quantity * Price;
+                System.Diagnostics.Debug.WriteLine($"Total: {Quantity} * {Price} = {total}");
+                return total;
+            }
+        }
+        
     }
 }

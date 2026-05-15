@@ -20,6 +20,7 @@ namespace WarehouseInventory.ViewModels
         private string _searchQuery = "";
         private CustomerDTO? _selectedCustomer;
         private bool _isMenuOpen;
+        private Window? _currentWindow;
 
         public ObservableCollection<CustomerDTO> Customers
         {
@@ -56,6 +57,12 @@ namespace WarehouseInventory.ViewModels
         public ICommand DeleteCustomerCommand { get; }
         public ICommand ClearSearchCommand { get; }
         public ICommand LogoutCommand { get; }
+        public ICommand NavigateProductsCommand { get; }
+        public ICommand NavigateMovementsCommand { get; }
+        public ICommand NavigateChartsCommand { get; }
+        public ICommand NavigateSuppliersCommand { get; }
+        public ICommand NavigateInvoicesCommand { get; }
+        public ICommand NavigateEmployeesCommand { get; }
 
         public CustomerViewModel()
         {
@@ -67,9 +74,20 @@ namespace WarehouseInventory.ViewModels
             EditCustomerCommand = new RelayCommand(_ => OpenCustomerEditWindow(SelectedCustomer), _ => SelectedCustomer != null);
             DeleteCustomerCommand = new RelayCommand(_ => _ = DeleteCustomerAsync(), _ => SelectedCustomer != null);
             ClearSearchCommand = new RelayCommand(_ => SearchQuery = "");
-            LogoutCommand = new RelayCommand(_ => Application.Current.Shutdown());
+            LogoutCommand = new RelayCommand(_ => NavigateToLogout());
+            NavigateProductsCommand = new RelayCommand(_ => NavigateToProduct());
+            NavigateMovementsCommand = new RelayCommand(_ => NavigateToMovement());
+            NavigateSuppliersCommand = new RelayCommand(_ => NavigateToSupplier());
+            NavigateInvoicesCommand = new RelayCommand(_ => NavigateToInvoice());
+            NavigateChartsCommand = new RelayCommand(_ => NavigateToChart());
+            NavigateEmployeesCommand = new RelayCommand(_ => NavigateToEmployee());
 
             _ = LoadCustomersAsync();
+        }
+        
+        public void SetCurrentWindow(Window window)
+        {
+            _currentWindow = window;
         }
 
         private async System.Threading.Tasks.Task LoadCustomersAsync()
@@ -156,6 +174,76 @@ namespace WarehouseInventory.ViewModels
                 MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+        
+        private void NavigateToProduct()
+        {
+            IsMenuOpen = false;
+            var productsWindow = new MainWindow();
+            productsWindow.Owner = _currentWindow;
+            productsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            productsWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToMovement()
+        {
+            IsMenuOpen = false;
+            var movementsWindow = new MovementsWindow();
+            movementsWindow.Owner = _currentWindow;
+            movementsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            movementsWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToSupplier()
+        {
+            IsMenuOpen = false;
+            var suppliersWindow = new SuppliersWindow();
+            suppliersWindow.Owner = _currentWindow;
+            suppliersWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            suppliersWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToInvoice()
+        {
+            IsMenuOpen = false;
+            var invoicesWindow = new InvoicesWindow();
+            invoicesWindow.Owner = _currentWindow;
+            invoicesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            invoicesWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToChart()
+        {
+            IsMenuOpen = false;
+            var chartsWindow = new ChartsWindow();
+            chartsWindow.Owner = _currentWindow;
+            chartsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            chartsWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToEmployee()
+        {
+            IsMenuOpen = false;
+            var employeesWindow = new EmployeesWindow();
+            employeesWindow.Owner = _currentWindow;
+            employeesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            employeesWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToLogout()
+        {
+            IsMenuOpen = false;
+            var logoutWindow = new LoginWindow();
+            logoutWindow.Owner = _currentWindow;
+            logoutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            logoutWindow.Show();
+            _currentWindow?.Hide();
         }
     }
 }

@@ -174,10 +174,6 @@
                         
                         <Separator/>
 
-                        <Button Content="🏠 Дашборд"
-                                Style="{StaticResource MenuButtonStyle}"
-                                Command="{Binding NavigateDashboardCommand}"/>
-
                         <Button Content="📦 Товары"
                                 Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateProductsCommand}"/>
@@ -190,18 +186,17 @@
                                 Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateSuppliersCommand}"/>
 
-                        <Button Content="🧾 Накладные"
-                                Style="{StaticResource MenuButtonStyle}"
-                                IsEnabled="False"/>
+                        <Button Content="📈 Графики" 
+                                Style="{StaticResource MenuButtonStyle}" 
+                                Command="{Binding NavigateChartsCommand}"/>
 
                         <Button Content="📊 Движения"
                                 Style="{StaticResource MenuButtonStyle}"
                                 Command="{Binding NavigateMovementsCommand}"/>
-
-                        <Button Content="📈 Отчёты"
+                        
+                        <Button Content="👨‍💼 Сотрудники"
                                 Style="{StaticResource MenuButtonStyle}"
-                                Command="{Binding NavigateReportsCommand}"/>
-
+                                Command="{Binding NavigateEmployeesCommand}"/>
                         <Separator/>
 
                         <Button Content="🚪 Выход"

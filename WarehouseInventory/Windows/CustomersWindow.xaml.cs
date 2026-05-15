@@ -8,6 +8,7 @@ public partial class CustomersWindow : Window
     public CustomersWindow()
     {
         InitializeComponent();
-        DataContext = new CustomerViewModel();
+        var vm = DataContext as CustomerViewModel;
+        vm.SetCurrentWindow(this);
     }
 }

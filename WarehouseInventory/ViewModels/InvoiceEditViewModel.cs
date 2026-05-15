@@ -16,15 +16,13 @@ namespace WarehouseInventory.ViewModels
     {
         private readonly HttpClient _httpClient;
         private Action? _close;
-
-        // ==================== ПОЛЯ ФОРМЫ ====================
+        
         private string _number = "";
         private string _description = "";
         private DateTime _date = DateTime.Now;
         private InvoiceTypeDTO? _selectedType;
         private CounterpartyDTO? _selectedCounterparty;
-
-        // ==================== КОЛЛЕКЦИИ ====================
+        
         private ObservableCollection<InvoiceTypeDTO> _types = new();
         private ObservableCollection<CounterpartyDTO> _counterparties = new();
         private ObservableCollection<InvoiceItemDTO> _items = new();
@@ -136,8 +134,8 @@ namespace WarehouseInventory.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки типов: {ex.Message}", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                /*MessageBox.Show($"Ошибка загрузки типов: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);*/
             }
         }
 
@@ -161,8 +159,8 @@ namespace WarehouseInventory.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки контрагентов: {ex.Message}", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                /*MessageBox.Show($"Ошибка загрузки контрагентов: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);*/
             }
         }
 
@@ -180,8 +178,8 @@ namespace WarehouseInventory.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки товаров: {ex.Message}", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                /*MessageBox.Show($"Ошибка загрузки товаров: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);*/
             }
         }
 
@@ -198,10 +196,10 @@ namespace WarehouseInventory.ViewModels
 
         private async System.Threading.Tasks.Task SaveAsync()
         {
-            // 1. Проверка номера накладной
+                    // 1. Проверка номера накладной
             if (string.IsNullOrWhiteSpace(Number))
             {
-                MessageBox.Show("❌ Введите номер накладной", "Ошибка",
+                MessageBox.Show("Введите номер накладной", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -209,7 +207,7 @@ namespace WarehouseInventory.ViewModels
             // 2. Проверка типа накладной
             if (SelectedType == null)
             {
-                MessageBox.Show("❌ Выберите тип накладной", "Ошибка",
+                MessageBox.Show("Выберите тип накладной", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -218,7 +216,7 @@ namespace WarehouseInventory.ViewModels
             if (SelectedCounterparty == null)
             {
                 string msg = SelectedType.Type == "Приходная" ? "поставщика" : "клиента";
-                MessageBox.Show($"❌ Выберите {msg}", "Ошибка",
+                MessageBox.Show($"Выберите {msg}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -226,7 +224,7 @@ namespace WarehouseInventory.ViewModels
             // 4. Проверка: есть ли товары?
             if (Items.Count == 0)
             {
-                MessageBox.Show("❌ Добавьте хотя бы один товар", "Ошибка",
+                MessageBox.Show("Добавьте хотя бы один товар", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -235,7 +233,7 @@ namespace WarehouseInventory.ViewModels
             var emptyItems = Items.Where(i => i.SelectedProduct == null).ToList();
             if (emptyItems.Any())
             {
-                MessageBox.Show("❌ Выберите товары для всех строк", "Ошибка",
+                MessageBox.Show("Выберите товары для всех строк", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -243,20 +241,43 @@ namespace WarehouseInventory.ViewModels
             // 6. Проверка: количество > 0
             if (Items.Any(i => i.Quantity <= 0))
             {
-                MessageBox.Show("❌ Количество товара должно быть больше 0", "Ошибка",
+                MessageBox.Show("Количество товара должно быть больше 0", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // 7. Для расходной накладной: проверка актуальности цены
+            // 7. Проверка: цена > 0
+            if (Items.Any(i => i.Price <= 0))
+            {
+                MessageBox.Show("Цена товара должна быть больше 0", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // 8. Для расходной накладной: проверка актуальности цены
             if (SelectedType.Type == "Расходная")
             {
                 await CheckAndUpdatePrices();
             }
 
-            // 8. Сохраняем
+            // 9. Сохраняем
             try
             {
+                var itemsToSend = new List<InvoiceItemDTO>();
+                foreach (var item in Items)
+                {
+                    itemsToSend.Add(new InvoiceItemDTO
+                    {
+                        ProductId = item.ProductId,
+                        ProductName = item.ProductName,
+                        Quantity = item.Quantity,
+                        Price = item.Price
+                    });
+                    
+                    // Отладка
+                    System.Diagnostics.Debug.WriteLine($"Sending: ProductId={item.ProductId}, Name={item.ProductName}, Qty={item.Quantity}, Price={item.Price}");
+                }
+
                 var request = new CreateInvoiceRequestDTO
                 {
                     Number = Number,
@@ -266,12 +287,7 @@ namespace WarehouseInventory.ViewModels
                     EmployeeId = GetCurrentEmployeeId(),
                     SupplierId = SelectedType.Type == "Приходная" ? SelectedCounterparty.Id : null,
                     CustomerId = SelectedType.Type == "Расходная" ? SelectedCounterparty.Id : null,
-                    Items = Items.Select(i => new InvoiceItemDTO
-                    {
-                        SelectedProduct = i.SelectedProduct,
-                        Quantity = i.Quantity,
-                        Price = i.Price
-                    }).ToList()
+                    Items = itemsToSend
                 };
 
                 var response = await _httpClient.PostAsJsonAsync("Invoices", request);
@@ -285,13 +301,13 @@ namespace WarehouseInventory.ViewModels
                 else
                 {
                     var error = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show($"❌ Ошибка: {error}", "Ошибка",
+                    MessageBox.Show($"Ошибка: {error}", "Ошибка",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Ошибка: {ex.Message}", "Ошибка",
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

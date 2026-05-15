@@ -21,6 +21,7 @@ public class ChartsController : ControllerBase
             var query = _context.StockMovements
                 .Include(s => s.Product)
                 .Include(s => s.MovementType)
+                .Include(s => s.Invoice)
                 .AsQueryable();
 
             if (startDate.HasValue)
@@ -29,7 +30,7 @@ public class ChartsController : ControllerBase
                 query = query.Where(s => s.Date <= endDate.Value);
 
             var movements = await query
-                .Select(s => new StockMovementDTO
+                .Select(s => new MovementItemDTO
                 {
                     Id = s.Id,
                     ProductId = s.ProductId,
@@ -59,15 +60,21 @@ public class ChartsController : ControllerBase
                 query = query.Where(s => s.Date <= endDate.Value);
 
             var totalMovements = await query.CountAsync();
+            
+            // Сумма ПРИХОДОВ (по сумме товаров)
             var totalIncome = await query
                 .Where(s => s.MovementType != null && s.MovementType.Name == "Приход")
                 .SumAsync(s => s.Quantity * (s.Product != null ? s.Product.Price : 0));
+            
+            // Сумма РАСХОДОВ (по сумме товаров)
             var totalExpense = await query
                 .Where(s => s.MovementType != null && s.MovementType.Name == "Расход")
                 .SumAsync(s => s.Quantity * (s.Product != null ? s.Product.Price : 0));
+            
+            // Текущий остаток на складе (сумма количества всех товаров)
             var currentStock = await _context.Products.SumAsync(p => p.Quantity);
 
-            return Ok(new
+            return Ok(new StatisticsDTO
             {
                 TotalMovements = totalMovements,
                 TotalIncome = totalIncome,
@@ -83,7 +90,7 @@ public class ChartsController : ControllerBase
                 .Include(s => s.Product)
                 .Where(s => s.MovementType != null && s.MovementType.Name == "Расход")
                 .GroupBy(s => s.ProductId)
-                .Select(g => new
+                .Select(g => new TopProductDTO
                 {
                     ProductId = g.Key,
                     TotalQuantity = g.Sum(s => s.Quantity),
@@ -106,7 +113,7 @@ public class ChartsController : ControllerBase
                 .Select(g => new TopProductDTO
                 {
                     ProductId = g.Key,
-                    TotalQuantity = (int)g.Sum(s => s.Quantity * (s.Product != null ? s.Product.Price : 0)),
+                    TotalQuantity = g.Sum(s => s.Quantity),
                     TotalAmount = g.Sum(s => s.Quantity * (s.Product != null ? s.Product.Price : 0)),
                     ProductName = g.First().Product != null ? g.First().Product.Name : ""
                 })
@@ -116,7 +123,25 @@ public class ChartsController : ControllerBase
 
             return Ok(topProducts);
         }
-    
+        
+        [HttpGet("ProductsStock")]
+        public async Task<IActionResult> GetProductsStock()
+        {
+            var stocks = await _context.Products
+                .Include(p => p.Category)
+                .Select(p => new ProductStockDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Quantity = p.Quantity,
+                    Price = p.Price,
+                    CategoryName = p.Category != null ? p.Category.Name : ""
+                })
+                .OrderByDescending(p => p.Quantity)
+                .ToListAsync();
+
+            return Ok(stocks);
+        }
         
         [HttpGet("TopCustomers")]
         public async Task<IActionResult> GetTopCustomers([FromQuery] int count = 10)
@@ -159,22 +184,5 @@ public class ChartsController : ControllerBase
 
             return Ok(topSuppliers);
         }
-        
-        [HttpGet("ProductsStock")]
-        public async Task<IActionResult> GetProductsStock()
-        {
-            var stocks = await _context.Products
-                .Include(p => p.Category)
-                .Select(p => new ProductStockDTO
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Quantity = p.Quantity,
-                    Price = p.Price,
-                    CategoryName = p.Category != null ? p.Category.Name : ""
-                })
-                .OrderByDescending(p => p.Quantity)
-                .ToListAsync();
-            return Ok(stocks);
-        }
+
 }

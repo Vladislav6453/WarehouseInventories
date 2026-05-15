@@ -74,7 +74,7 @@ namespace WarehouseInventory.ViewModels
             EditSupplierCommand = new RelayCommand(_ => OpenSupplierEditWindow(SelectedSupplier), _ => SelectedSupplier != null);
             DeleteSupplierCommand = new RelayCommand(_ => _ = DeleteSupplierAsync(), _ => SelectedSupplier != null);
             ClearSearchCommand = new RelayCommand(_ => SearchQuery = "");
-            LogoutCommand = new RelayCommand(_ => Application.Current.Shutdown());
+            LogoutCommand = new RelayCommand(_ => NavigateToLogout());
             NavigateToProductCommand = new RelayCommand(_ => NavigateToProduct());
             NavigateToChartCommand = new RelayCommand(_ => NavigateToChart());
             NavigateToInvoiceCommand = new RelayCommand(_ => NavigateToInvoice());
@@ -233,6 +233,16 @@ namespace WarehouseInventory.ViewModels
             employeesWindow.Owner = _currentWindow;
             employeesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             employeesWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToLogout()
+        {
+            IsMenuOpen = false;
+            var logoutWindow = new LoginWindow();
+            logoutWindow.Owner = _currentWindow;
+            logoutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            logoutWindow.Show();
             _currentWindow?.Hide();
         }
     }

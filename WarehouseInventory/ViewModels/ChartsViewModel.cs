@@ -240,8 +240,6 @@ namespace WarehouseInventory.ViewModels
             _currentWindow = window;
         }
         
-        
-
         private void SetPeriod(int days, string periodName)
         {
             _startDate = DateTime.Now.AddDays(-days);

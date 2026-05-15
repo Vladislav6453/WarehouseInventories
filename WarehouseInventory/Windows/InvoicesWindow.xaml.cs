@@ -8,6 +8,7 @@ public partial class InvoicesWindow : Window
     public InvoicesWindow()
     {
         InitializeComponent();
-        DataContext = new InvoiceViewModel();
+        var vm = DataContext as InvoiceViewModel;
+        vm.SetCurrentWindow(this);
     }
 }

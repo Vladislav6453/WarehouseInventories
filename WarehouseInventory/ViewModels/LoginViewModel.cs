@@ -75,10 +75,19 @@ public class LoginViewModel : BaseViewModel
                 if (response.IsSuccessStatusCode)
                 {
                     var employee = await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
-                    
+                
                     if (employee != null)
                     {
-                        Application.Current.Properties["CurrentUser"] = employee;
+                        Session.CurrentUser = new EmployeeDTO
+                        {
+                            Id = employee.Id,
+                            Login = employee.Login,
+                            FirstName = employee.FirstName,
+                            LastName = employee.LastName,
+                            RoleId = employee.RoleId,
+                            RoleName = employee.RoleName
+                        };
+                    
                         OnLoginSuccess?.Invoke();
                     }
                     else

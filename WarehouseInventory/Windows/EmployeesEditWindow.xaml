@@ -7,11 +7,11 @@
         xmlns:viewModels="clr-namespace:WarehouseInventory.ViewModels"
         mc:Ignorable="d"
         Title="EmployeesEditWindow" Height="620" Width="600">
-
+<!--
     <Window.DataContext>
         <viewModels:EmployeeEditViewModel/>
     </Window.DataContext>
-
+-->
     <Window.Resources>
         <DropShadowEffect x:Key="CardShadow"
                           Color="#000000"
