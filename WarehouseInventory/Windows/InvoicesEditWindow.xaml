@@ -70,6 +70,7 @@
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
@@ -100,6 +101,7 @@
                           Margin="0,0,0,12"
                           ItemsSource="{Binding Types}"
                           ToolTip="Приход или расход"
+                          DisplayMemberPath="Type"
                           SelectedItem="{Binding SelectedType}"/>
                 
                 <ComboBox Grid.Row="1" Grid.Column="0"
@@ -107,52 +109,67 @@
                           Margin="0,0,0,0"
                           ItemsSource="{Binding Counterparties}"
                           SelectedItem="{Binding SelectedCounterparty}"
+                          DisplayMemberPath="Name"
                           ToolTip="Выбор клиента или поставщика"/>
             </Grid>
             
             <DataGrid Grid.Row="2"
                       ItemsSource="{Binding Items}"
                       AutoGenerateColumns="False"
-                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="True"
                       GridLinesVisibility="None"
                       RowHeight="52"
                       SelectionMode="Single"
                       Margin="0,5,0,10">
+                            <DataGrid.Resources>
+                    <DataTemplate x:Key="ReadonlyTemplate">
+                        <TextBlock Text="{Binding ProductName}" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                    
+                    <DataTemplate x:Key="EditingTemplate">
+                        <ComboBox ItemsSource="{Binding DataContext.AvailableProducts, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                  SelectedItem="{Binding SelectedProduct}"
+                                  DisplayMemberPath="Name"
+                                  IsEditable="False"/>
+                    </DataTemplate>
+                </DataGrid.Resources>
 
                 <DataGrid.Columns>
 
-                    <DataGridTemplateColumn Header="Товар" Width="*">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding SelectedProduct.Name}" VerticalAlignment="Center" Margin="8,0"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <ComboBox ItemsSource="{Binding DataContext.AvailableProducts, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                          SelectedItem="{Binding SelectedProduct}" DisplayMemberPath="Name" IsEditable="False"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
+                    <!-- Товар -->
+                    <DataGridTemplateColumn Header="Товар" Width="*"
+                                            CellTemplate="{StaticResource ReadonlyTemplate}"
+                                            CellEditingTemplate="{StaticResource EditingTemplate}"/>
 
+                    <!-- Количество -->
                     <DataGridTextColumn Header="Кол-во"
-                                        Binding="{Binding Quantity}"
+                                        Binding="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
                                         Width="100"/>
 
+                    <!-- Цена (только для чтения, подставляется из товара) -->
                     <DataGridTextColumn Header="Цена"
-                                        Binding="{Binding Price}"
+                                        Binding="{Binding Price, StringFormat='N2'}"
+                                        IsReadOnly="True"
                                         Width="120"/>
 
+                    <!-- Сумма -->
                     <DataGridTextColumn Header="Сумма"
-                                        Binding="{Binding Total}"
-                                        Width="120"
-                                        IsReadOnly="True"/>
-                    
+                                        Binding="{Binding Total, StringFormat='N2'}"
+                                        IsReadOnly="True"
+                                        Width="120"/>
+
+                    <!-- Удалить -->
                     <DataGridTemplateColumn Header="" Width="40">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="✕" FontSize="14" FontWeight="Bold" Background="Transparent"
-                                        Foreground="#EF4444" BorderThickness="0" Cursor="Hand"
+                                <Button Content="✕" 
+                                        FontSize="14" 
+                                        FontWeight="Bold" 
+                                        Background="Transparent"
+                                        Foreground="#EF4444" 
+                                        BorderThickness="0" 
+                                        Cursor="Hand"
                                         Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}"/>
                             </DataTemplate>

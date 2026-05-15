@@ -25,7 +25,23 @@ namespace WarehouseInventory.ViewModels
         private string _password = "";
         private EmployeeRoleDTO? _selectedRole;
         private ObservableCollection<EmployeeRoleDTO> _roles = new();
+        private System.Windows.Controls.PasswordBox? _passwordBox;
+        public void SetPasswordBinding(System.Windows.Controls.PasswordBox passwordBox)
+        {
+            _passwordBox = passwordBox;
+    
+            // Подписываемся на изменение пароля
+            _passwordBox.PasswordChanged += (s, e) =>
+            {
+                Password = _passwordBox.Password;
+            };
+        }
 
+        public string Password
+        {
+            get => _password;
+            set { _password = value; OnPropertyChanged(); }
+        }
         public string LastName
         {
             get => _lastName;
@@ -43,12 +59,7 @@ namespace WarehouseInventory.ViewModels
             get => _login;
             set { _login = value; OnPropertyChanged(); }
         }
-
-        public string Password
-        {
-            get => _password;
-            set { _password = value; OnPropertyChanged(); }
-        }
+        
 
         public EmployeeRoleDTO? SelectedRole
         {
@@ -120,7 +131,6 @@ namespace WarehouseInventory.ViewModels
 
         private async System.Threading.Tasks.Task SaveAsync()
         {
-            // Валидация
             if (string.IsNullOrWhiteSpace(LastName))
             {
                 MessageBox.Show("Введите фамилию", "Ошибка",

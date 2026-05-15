@@ -22,9 +22,9 @@ public partial class MainWindow : Window
         InitializeComponent();
         var vm = DataContext as MainViewModel;
         vm.SetCurrentWindow(this);
-        vm.OnLogout += () =>
-        {
-            Close();
-        };
+        //vm.OnLogout += () =>
+        //{
+            //Close();
+        //};
     }
 }

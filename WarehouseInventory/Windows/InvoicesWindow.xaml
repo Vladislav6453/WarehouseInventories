@@ -134,18 +134,21 @@
             </Grid.ColumnDefinitions>
 
             <Button Content="☰"
-                    FontSize="30"
-                    Width="42"
-                    Height="42"
-                    Background="#F4F6F9"
+                    Width="40"
+                    Height="60"
+                    FontSize="40"
+                    Margin="0 0 20 0"
+                    Background="Transparent"
                     BorderBrush="Transparent"
                     BorderThickness="1"
+                    Cursor="Hand"
                     Command="{Binding ToggleMenuCommand}"/>
 
             <Popup IsOpen="{Binding IsMenuOpen}"
                    PlacementTarget="{Binding ElementName=MenuButton}"
                    Placement="Bottom"
-                   StaysOpen="False">
+                   StaysOpen="False"
+                   AllowsTransparency="True">
 
                 <Border Background="White"
                         Width="220"
@@ -279,13 +282,24 @@
                       AlternatingRowBackground="#F9FAFB">
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="№" Binding="{Binding Number}" Width="120"/>
-                    <DataGridTextColumn Header="Дата" Binding="{Binding Date}" Width="150"/>
-                    <DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="120"/>
-                    <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="*"/>
-                    <DataGridTextColumn Header="Сумма" Binding="{Binding TotalAmount}" Width="150"/>
+                    <DataGridTextColumn Header="№" Binding="{Binding Number}" Width="100"/>
+                    <DataGridTextColumn Header="Дата" Binding="{Binding Date, StringFormat='dd.MM.yyyy'}" Width="110"/>
+                    <DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="100"/>
+                    <DataGridTextColumn Header="Контрагент" Binding="{Binding Counterparty}" Width="150"/>
+                    
+                    <DataGridTemplateColumn Header="Товары" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ProductsList}" 
+                                           TextWrapping="Wrap"
+                                           VerticalAlignment="Center"
+                                           Margin="5,5"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+        
+                    <DataGridTextColumn Header="Сумма" Binding="{Binding TotalAmount, StringFormat='N2'}" Width="120"/>
                 </DataGrid.Columns>
-
             </DataGrid>
         </Border>
     </Grid>

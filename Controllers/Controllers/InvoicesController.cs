@@ -21,29 +21,31 @@ public class InvoicesController : ControllerBase
     {
         var invoices = await _context.Invoices
             .Include(i => i.InvoiceType)
-            .Include(i => i.Employee)
             .Include(i => i.Supplier)
             .Include(i => i.Customer)
+            .Include(i => i.StockMovements)
+            .ThenInclude(s => s.Product)
             .OrderByDescending(i => i.Date)
-            .Select(i => new InvoiceDto
-            {
-                Id = i.Id,
-                Number = i.Number,
-                Description = i.Description,
-                Date = i.Date,
-                TypeId = i.TypeId,
-                Type = i.InvoiceType != null ? i.InvoiceType.Type : "",
-                EmployeeId = i.EmployeeId,
-                EmployeeName = i.Employee != null ? $"{i.Employee.LastName} {i.Employee.FirstName}" : "",
-                SupplierId = i.SupplierId,
-                SupplierName = i.Supplier != null ? i.Supplier.Name : "",
-                CustomerId = i.CustomerId,
-                CustomerName = i.Customer != null ? i.Customer.Name : "",
-                TotalAmount = i.TotalAmount
-            })
             .ToListAsync();
 
-        return Ok(invoices);
+        var result = invoices.Select(i => new InvoiceDto
+        {
+            Id = i.Id,
+            Number = i.Number,
+            Date = i.Date,
+            Type = i.InvoiceType?.Type ?? "",
+            SupplierId = i.SupplierId,
+            SupplierName = i.Supplier?.Name ?? "",
+            CustomerName = i.Customer?.Name ?? "",
+            TotalAmount = i.TotalAmount,
+            ProductsList = i.StockMovements != null && i.StockMovements.Any()
+                ? string.Join(", ", i.StockMovements
+                    .Where(s => s.Product != null)
+                    .Select(s => $"{s.Product.Name} ({s.Quantity} шт.)"))
+                : "Нет товаров"
+        });
+
+        return Ok(result);
     }
 
     [HttpGet("GetTypes")]

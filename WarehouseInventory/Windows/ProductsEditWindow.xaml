@@ -116,6 +116,7 @@
                                Foreground="#4B5563"
                                Margin="0,0,0,6"/>
                     <ComboBox ItemsSource="{Binding Categories}"
+                              DisplayMemberPath="Name"
                               SelectedItem="{Binding SelectedCategory}"/>
                     
                 </StackPanel>

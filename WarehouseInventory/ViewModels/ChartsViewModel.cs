@@ -10,6 +10,7 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
+using WarehouseInventory.Windows;
 
 namespace WarehouseInventory.ViewModels
 {
@@ -200,17 +201,24 @@ namespace WarehouseInventory.ViewModels
         }
         public ICommand ToggleMenuCommand { get; }
         public ICommand RefreshCommand { get; }
-        public ICommand NavigateProductCommand { get; }
         public ICommand SetWeekCommand { get; }
         public ICommand SetMonthCommand { get; }
         public ICommand SetQuarterCommand { get; }
         public ICommand SetYearCommand { get; }
+        
+        public ICommand NavigateProductCommand { get; }
+        public ICommand NavigateToCustomerCommand { get; }
+        public ICommand NavigateToMovementCommand { get; }
+        public ICommand NavigateToInvoiceCommand { get; }
+        public ICommand NavigateToSupplierCommand { get; }
+        public ICommand LogoutCommand { get; }
 
         public ChartsViewModel()
         {
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("http://localhost:5059/api/");
 
+            LogoutCommand = new RelayCommand(_ => OnLogout());
             ToggleMenuCommand = new RelayCommand(_ => IsMenuOpen = !IsMenuOpen);
             RefreshCommand = new RelayCommand(_ => _ = LoadAllDataAsync());
             SetWeekCommand = new RelayCommand(_ => SetPeriod(7, "Последние 7 дней"));
@@ -218,7 +226,12 @@ namespace WarehouseInventory.ViewModels
             SetQuarterCommand = new RelayCommand(_ => SetPeriod(90, "Последние 90 дней"));
             SetYearCommand = new RelayCommand(_ => SetPeriod(365, "Последние 365 дней"));
 
-            NavigateProductCommand = new RelayCommand(_ => NavigateProduct());
+            NavigateProductCommand = new RelayCommand(_ => NavigateToProduct());
+            NavigateToCustomerCommand = new RelayCommand(_ => NavigateToCustomer());
+            NavigateToMovementCommand = new RelayCommand(_ => NavigateToMovement());
+            NavigateToInvoiceCommand = new RelayCommand(_ => NavigateToInvoice());
+            NavigateToSupplierCommand = new RelayCommand(_ => NavigateToSupplier());
+            
             _ = LoadAllDataAsync();
         }
         
@@ -227,15 +240,7 @@ namespace WarehouseInventory.ViewModels
             _currentWindow = window;
         }
         
-        private void NavigateProduct()
-        {
-            IsMenuOpen = false;
-            var productsWindow = new MainWindow();
-            productsWindow.Owner = _currentWindow;
-            productsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            productsWindow.Show();
-            _currentWindow?.Hide();
-        }
+        
 
         private void SetPeriod(int days, string periodName)
         {
@@ -479,6 +484,66 @@ namespace WarehouseInventory.ViewModels
                 MessageBox.Show($"❌ Ошибка загрузки топ поставщиков: {ex.Message}", "Ошибка", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+        
+        private void NavigateToProduct()
+        {
+            IsMenuOpen = false;
+            var productsWindow = new MainWindow();
+            productsWindow.Owner = _currentWindow;
+            productsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            productsWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToCustomer()
+        {
+            IsMenuOpen = false;
+            var customersWindow = new CustomersWindow();
+            customersWindow.Owner = _currentWindow;
+            customersWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            customersWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToMovement()
+        {
+            IsMenuOpen = false;
+            var movementsWindow = new MovementsWindow();
+            movementsWindow.Owner = _currentWindow;
+            movementsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            movementsWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToInvoice()
+        {
+            IsMenuOpen = false;
+            var invoicesWindow = new InvoicesWindow();
+            invoicesWindow.Owner = _currentWindow;
+            invoicesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            invoicesWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToSupplier()
+        {
+            IsMenuOpen = false;
+            var suppliersWindow = new SuppliersWindow();
+            suppliersWindow.Owner = _currentWindow;
+            suppliersWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            suppliersWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void OnLogout()
+        {
+            IsMenuOpen = false;
+            var loginWindow = new LoginWindow();
+            loginWindow.Owner = _currentWindow;
+            loginWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            loginWindow.Show();
+            _currentWindow?.Hide();
         }
     }
 }

@@ -49,14 +49,12 @@ public class MainViewModel : BaseViewModel
 
         public ICommand EditProductCommand { get; }
         public ICommand AddProductCommand { get; }
-        public ICommand LogoutCommand { get; }
         public ICommand NavigateToChartCommand { get; }
         public ICommand NavigateToMovementCommand { get; }
         public ICommand NavigateToInvoiceCommand { get; }
         public ICommand NavigateToCustomerCommand { get; }
         public ICommand NavigateToSupplierCommand { get; }
-
-        public event Action? OnLogout;
+        public ICommand LogoutCommand { get; }
 
         public MainViewModel()
         {
@@ -64,9 +62,13 @@ public class MainViewModel : BaseViewModel
             _httpClient.BaseAddress = new Uri("http://localhost:5059/api/");
             AddProductCommand = new RelayCommand(_ => OpenAddProductWindow());
             EditProductCommand = new RelayCommand(_ => OpenProductEditWindow(SelectedProduct), _ => SelectedProduct != null);
-            LogoutCommand = new RelayCommand(_ => OnLogout?.Invoke());
-
+            //LogoutCommand = new RelayCommand(_ => OnLogout?.Invoke());
+            LogoutCommand = new RelayCommand(_ => OnLogout());
             NavigateToChartCommand = new RelayCommand(_ => NavigateToChart());
+            NavigateToSupplierCommand = new RelayCommand(_ => NavigateToSupplier());
+            NavigateToMovementCommand = new RelayCommand(_ => NavigateToMovement());
+            NavigateToCustomerCommand = new RelayCommand(_ => NavigateToCustomer());
+            NavigateToInvoiceCommand = new RelayCommand(_ => NavigateToInvoice());
             
             _ = LoadProductsAsync();
         }
@@ -83,6 +85,55 @@ public class MainViewModel : BaseViewModel
             chartsWindow.Owner = _currentWindow;
             chartsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             chartsWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToInvoice()
+        {
+            IsMenuOpen = false;
+            var invoicesWindow = new InvoicesWindow();
+            invoicesWindow.Owner = _currentWindow;
+            invoicesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            invoicesWindow.Show();
+            _currentWindow?.Hide();
+        }
+        private void NavigateToCustomer()
+        {
+            IsMenuOpen = false;
+            var customersWindow = new CustomersWindow();
+            customersWindow.Owner = _currentWindow;
+            customersWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            customersWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToSupplier()
+        {
+            IsMenuOpen = false;
+            var suppliersWindow = new SuppliersWindow();
+            suppliersWindow.Owner = _currentWindow;
+            suppliersWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            suppliersWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void NavigateToMovement()
+        {
+            IsMenuOpen = false;
+            var movementsWindow = new MovementsWindow();
+            movementsWindow.Owner = _currentWindow;
+            movementsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            movementsWindow.Show();
+            _currentWindow?.Hide();
+        }
+        
+        private void OnLogout()
+        {
+            IsMenuOpen = false;
+            var loginWindow = new LoginWindow();
+            loginWindow.Owner = _currentWindow;
+            loginWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            loginWindow.Show();
             _currentWindow?.Hide();
         }
 

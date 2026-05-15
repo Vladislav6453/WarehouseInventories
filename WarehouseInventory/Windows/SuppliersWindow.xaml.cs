@@ -8,6 +8,7 @@ public partial class SuppliersWindow : Window
     public SuppliersWindow()
     {
         InitializeComponent();
-        DataContext = new SupplierViewModel();
+        var vm = DataContext as SupplierViewModel;
+        vm.SetCurrentWindow(this);
     }
 }

@@ -84,8 +84,8 @@
                     <Button Content="📈 Графики" Command="{Binding NavigateToChartCommand}" CommandParameter="Dashboard" Style="{StaticResource NavButtonStyle}"/>
                     <Button Content="⏩ Движения" Command="{Binding NavigateToMovementCommand}" CommandParameter="StockMovements" Style="{StaticResource NavButtonStyle}"/>
                     <Button Content="✉️ Накладные" Command="{Binding NavigateToInvoiceCommand}" CommandParameter="Charts" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="🏭 Поставщики" Command="{Binding NavigateToCustomerCommand}" CommandParameter="Suppliers" Style="{StaticResource NavButtonStyle}"/>
-                    <Button Content="👤 Клиенты" Command="{Binding NavigateToSupplierCommand}" CommandParameter="Customers" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="🏭 Поставщики" Command="{Binding NavigateToSupplierCommand}" CommandParameter="Suppliers" Style="{StaticResource NavButtonStyle}"/>
+                    <Button Content="👤 Клиенты" Command="{Binding NavigateToCustomerCommand}" CommandParameter="Customers" Style="{StaticResource NavButtonStyle}"/>
                 </StackPanel>
 
                 <Separator Margin="10,20,10,10" Background="#34495E"/>
@@ -123,7 +123,7 @@
                     <Button Content="Удалить" Width="100" Height="30" Background="#E74C3C" Foreground="White"/>
                 </StackPanel>
                 
-                <DataGrid Grid.Row="1" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedProduct}">
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedProduct}" IsReadOnly="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="🧾 Название" Binding="{Binding Name}" Width="200"/>
                         <DataGridTextColumn Header="🏷️ Категория" Binding="{Binding CategoryName}" Width="180"/>

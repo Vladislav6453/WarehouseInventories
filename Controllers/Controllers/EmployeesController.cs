@@ -27,7 +27,8 @@ namespace Controllers.Controllers
                     FirstName = e.FirstName,
                     LastName = e.LastName,
                     RoleId = e.RoleId,
-                    RoleName = e.Role != null ? e.Role.Role : ""
+                    RoleName = e.Role != null ? e.Role.Role : "",
+                    Password = !string.IsNullOrWhiteSpace(e.Password)
                 })
                 .OrderBy(e => e.LastName)
                 .ToListAsync();
@@ -52,7 +53,8 @@ namespace Controllers.Controllers
                 FirstName = employee.FirstName,
                 LastName = employee.LastName,
                 RoleId = employee.RoleId,
-                RoleName = employee.Role?.Role ?? ""
+                RoleName = employee.Role?.Role ?? "",
+                Password = !string.IsNullOrWhiteSpace(employee.Password)
             });
         }
 
@@ -62,8 +64,7 @@ namespace Controllers.Controllers
             var employee = await _context.Employees.FindAsync(request.Id);
             if (employee == null)
                 return NotFound(new { message = "Сотрудник не найден" });
-
-            // Проверка уникальности логина (если изменился)
+            
             if (employee.Login != request.Login)
             {
                 var loginExists = await _context.Employees.AnyAsync(e => e.Login == request.Login);
@@ -75,11 +76,11 @@ namespace Controllers.Controllers
             employee.FirstName = request.FirstName;
             employee.LastName = request.LastName;
             employee.RoleId = request.RoleId;
+    
 
-            // Если пароль передан и не пустой — обновляем
             if (!string.IsNullOrWhiteSpace(request.Password))
             {
-                employee.Password = request.Password;
+                employee.Password = request.Password; 
             }
 
             await _context.SaveChangesAsync();
@@ -93,12 +94,10 @@ namespace Controllers.Controllers
             var employee = await _context.Employees.FindAsync(id);
             if (employee == null)
                 return NotFound(new { message = "Сотрудник не найден" });
-
-            // Нельзя удалить администратора? (опционально)
+            
             if (employee.RoleId == 1)
                 return BadRequest(new { message = "Нельзя удалить администратора" });
-
-            // Проверка: есть ли накладные у этого сотрудника?
+            
             var hasInvoices = await _context.Invoices.AnyAsync(i => i.EmployeeId == id);
             if (hasInvoices)
                 return BadRequest(new { message = "Нельзя удалить сотрудника, у которого есть накладные" });

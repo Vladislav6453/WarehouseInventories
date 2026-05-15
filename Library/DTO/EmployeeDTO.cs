@@ -15,5 +15,7 @@ namespace Library.DTO
         public int RoleId { get; set; }
         public string RoleName { get; set; } = "";
         public string FullName => $"{LastName} {FirstName}";
+        public bool Password { get; set; }
+        public string PasswordMask => Password ? "******" : "—";
     }
 }

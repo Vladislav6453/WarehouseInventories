@@ -72,7 +72,7 @@ namespace Controllers.Controllers
             return Ok(new { message = "Товар обновлен" });
         }
 
-        [HttpDelete("GetCategories")]
+        [HttpGet("GetCategories")]
         public async Task<IActionResult> GetCategories()
         {
             var categories = await _context.Categories
@@ -80,7 +80,7 @@ namespace Controllers.Controllers
                 {
                     Id = c.Id,
                     Name = c.Name
-                }).ToListAsync();
+                }).ToArrayAsync();
             return Ok(categories);
         }
     }

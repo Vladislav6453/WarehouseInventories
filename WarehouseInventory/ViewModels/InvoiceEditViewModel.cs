@@ -109,6 +109,15 @@ namespace WarehouseInventory.ViewModels
 
             _ = LoadTypesAsync();
             _ = LoadProductsAsync();
+            
+            Types.CollectionChanged += async (s, e) =>
+            {
+                if (SelectedType == null && Types.Count > 0)
+                {
+                    SelectedType = Types.FirstOrDefault();
+                    await LoadCounterpartiesAsync();
+                }
+            };
         }
 
         public void SetClose(Action close) => _close = close;

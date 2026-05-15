@@ -8,8 +8,7 @@ public partial class ChartsWindow : Window
     public ChartsWindow()
     {
         InitializeComponent();
-        var vm = new ChartsViewModel();
-        DataContext = vm;
+        var vm = DataContext as ChartsViewModel;
         vm.SetCurrentWindow(this);
     }
 }

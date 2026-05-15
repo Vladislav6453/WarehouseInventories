@@ -184,6 +184,7 @@
                 Effect="{StaticResource CardShadow}">
 
             <DataGrid ItemsSource="{Binding Employees}"
+                      SelectedItem="{Binding SelectedEmployee}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
                       GridLinesVisibility="None"
@@ -193,20 +194,20 @@
                       AlternatingRowBackground="#F9FAFB">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="👤 Имя"
-                                        Binding="{Binding Name}"
+                                        Binding="{Binding FullName}"
                                         Width="*"
                                         MinWidth="240"/>
 
-                    <DataGridTextColumn Header="📞 Телефон"
-                                        Binding="{Binding Phone}"
+                    <DataGridTextColumn Header="👑 Роль"
+                                        Binding="{Binding RoleName}"
                                         Width="170"/>
 
-                    <DataGridTextColumn Header="✉️ Email"
-                                        Binding="{Binding Email}"
-                                        Width="210"/>
+                    <DataGridTextColumn Header="✉️ Логин"
+                                        Binding="{Binding Login}"
+                                        Width="150"/>
 
-                    <DataGridTextColumn Header="📍 Домашний адрес"
-                                        Binding="{Binding Address}"
+                    <DataGridTextColumn Header="🔒 Пароль" 
+                                        Binding="{Binding PasswordMask}" 
                                         Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>

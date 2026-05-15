@@ -11,8 +11,8 @@ public partial class EmployeesEditWindow : Window
     {
         InitializeComponent();
 
-        var vm = new EmployeeEditViewModel(employee);
-        vm.SetClose(Close);
-        DataContext = vm;
+        var vm = DataContext as EmployeeEditViewModel;  // DataContext уже в XAML
+        vm?.SetPasswordBinding(PasswordBox);             // Передаём PasswordBox
+        vm?.SetClose(Close);
     }
 }

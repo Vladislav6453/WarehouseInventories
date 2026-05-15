@@ -115,7 +115,8 @@ namespace WarehouseInventory.ViewModels
         {
             try
             {
-                var categories = await _httpClient.GetFromJsonAsync<CategoryDTO[]>("Products/GetCategories");
+                var response =  await _httpClient.GetAsync("Products/GetCategories");
+                var categories = await response.Content.ReadFromJsonAsync<CategoryDTO[]>();
                 if (categories != null)
                 {
                     Categories.Clear();

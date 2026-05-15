@@ -215,7 +215,7 @@ public partial class AppDbContext : DbContext
         });
 
         
-        modelBuilder.Entity<EmployeeRole>().HasData(
+        /*modelBuilder.Entity<EmployeeRole>().HasData(
             new EmployeeRole{Id=1,Role = "Админ"},
             new EmployeeRole{Id=2,Role = "Сотрудник"},
             new EmployeeRole{Id=3,Role = "Менеджер"}
@@ -236,7 +236,7 @@ public partial class AppDbContext : DbContext
             new Product{Id=1,Name = "Смартфон iPhone 15", Description = "", Price = 15000, Quantity = 1, CategoryId = 1 },
             new Product{Id=2,Name = "Ноутбук MacBook Air", Description = "", Price = 999000, Quantity = 0, CategoryId = 1 },
             new Product{Id=3,Name = "Мышь Logitech", Description = "", Price = 2500, Quantity = 2, CategoryId = 2 }
-        );
+        );*/
         base.OnModelCreating(modelBuilder);
     }
 
