@@ -89,7 +89,19 @@ namespace WarehouseInventory.ViewModels
             set { _availableProducts = value; OnPropertyChanged(); }
         }
 
-        public decimal TotalAmount => Items.Sum(i => i.Total);
+        private decimal _totalAmount;
+        public decimal TotalAmount
+        {
+            get => _totalAmount;
+            set { _totalAmount = value; OnPropertyChanged(); }
+        }
+
+        private void RecalculateTotal()
+        {
+            TotalAmount = Items.Sum(i => i.Total);
+        }
+
+        /*public decimal TotalAmount => Items.Sum(i => i.Total);*/
 
         public ICommand AddItemCommand { get; }
         public ICommand RemoveItemCommand { get; }
@@ -107,7 +119,8 @@ namespace WarehouseInventory.ViewModels
 
             _ = LoadTypesAsync();
             _ = LoadProductsAsync();
-            
+
+            Items.CollectionChanged += (s, e) => RecalculateTotal();
             Types.CollectionChanged += async (s, e) =>
             {
                 if (SelectedType == null && Types.Count > 0)
@@ -185,7 +198,14 @@ namespace WarehouseInventory.ViewModels
 
         private void AddItem()
         {
-            Items.Add(new InvoiceItemDTO());
+            var newItem = new InvoiceItemDTO();
+            newItem.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(InvoiceItemDTO.Total))
+                    RecalculateTotal();
+            };
+            Items.Add(newItem);
+            RecalculateTotal();
         }
 
         private void RemoveItem(object? parameter)
@@ -263,20 +283,13 @@ namespace WarehouseInventory.ViewModels
             // 9. Сохраняем
             try
             {
-                var itemsToSend = new List<InvoiceItemDTO>();
-                foreach (var item in Items)
+                var itemsToSend = Items.Select(item => new InvoiceItemDTO
                 {
-                    itemsToSend.Add(new InvoiceItemDTO
-                    {
-                        ProductId = item.ProductId,
-                        ProductName = item.ProductName,
-                        Quantity = item.Quantity,
-                        Price = item.Price
-                    });
-                    
-                    // Отладка
-                    System.Diagnostics.Debug.WriteLine($"Sending: ProductId={item.ProductId}, Name={item.ProductName}, Qty={item.Quantity}, Price={item.Price}");
-                }
+                    ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    Quantity = item.Quantity,
+                    Price = item.Price
+                }).ToList();
 
                 var request = new CreateInvoiceRequestDTO
                 {
@@ -314,8 +327,9 @@ namespace WarehouseInventory.ViewModels
 
         private int GetCurrentEmployeeId()
         {
-            // Временно: потом из сессии
-            return Application.Current.Properties["CurrentUserId"] as int? ?? 1;
+            if (Application.Current.Properties["CurrentUserId"] is int userId)
+                return userId;
+            return 1;
         }
 
         private async System.Threading.Tasks.Task CheckAndUpdatePrices()
@@ -333,7 +347,11 @@ namespace WarehouseInventory.ViewModels
                         "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                     if (result == MessageBoxResult.Yes)
+                    {
                         item.Price = product.Price;
+                        RecalculateTotal();
+                    }
+                        
                 }
             }
         }

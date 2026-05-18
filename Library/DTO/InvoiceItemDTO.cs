@@ -13,14 +13,20 @@ namespace Library.DTO
         private ProductForInvoiceDTO? _selectedProduct;
         private int _quantity = 1;
         private decimal _price;
-        private int _productId;  
-        private string _productName = ""; 
+        private int _productId;
+        private string _productName = "";
+        private decimal _total;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void UpdateTotal()
+        {
+            Total = Quantity * Price;
         }
 
         public ProductForInvoiceDTO? SelectedProduct
@@ -32,11 +38,13 @@ namespace Library.DTO
                 if (value != null)
                 {
                     Price = value.Price;
+                    ProductId = value.Id;
+                    ProductName = value.Name;
                 }
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ProductName));
                 OnPropertyChanged(nameof(ProductId));
-                OnPropertyChanged(nameof(Total));
+                UpdateTotal();
             }
         }
 
@@ -47,7 +55,7 @@ namespace Library.DTO
             {
                 _quantity = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(Total));
+                UpdateTotal();
             }
         }
 
@@ -58,7 +66,7 @@ namespace Library.DTO
             {
                 _price = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(Total));
+                UpdateTotal();
             }
         }
         
@@ -76,11 +84,12 @@ namespace Library.DTO
 
         public decimal Total
         {
-            get
+            get => _total;
+            private set
             {
-                var total = Quantity * Price;
-                System.Diagnostics.Debug.WriteLine($"Total: {Quantity} * {Price} = {total}");
-                return total;
+                _total = value;
+                OnPropertyChanged();
+                System.Diagnostics.Debug.WriteLine($"Total updated: {_total}");
             }
         }
         
